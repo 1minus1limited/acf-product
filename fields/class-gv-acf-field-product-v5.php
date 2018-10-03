@@ -160,23 +160,25 @@ class gv_acf_field_product extends acf_field {
 		$product_detail = '';
 		$selected_taxon = '';
 
-		$selected_product = $field['value'];
-		if($selected_product){
-	 		/* get the product details start */
-			$ch = curl_init();
-			$curlConfig = array(
-			    CURLOPT_URL => $site_options->field('spree_endpoint') . "products/". $selected_product ."?per_page=1000&token=" . $site_options->field('webhook_token')
-			);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-			curl_setopt_array($ch, $curlConfig);
-			$result = curl_exec($ch);
-			curl_close($ch);
+		$selected_product = explode("_", $field['value'])[0];
+		$selected_taxon = explode("_", $field['value'])[1];
 
-			$product_detail = json_decode($result, true);
-			// print_r($product_detail['taxon_ids']);
-	 		/* get the product details end */
-	 		$selected_taxon = $product_detail['taxon_ids'][0];
- 		}
+		// if($selected_product){
+	 // 		/* get the product details start */
+		// 	$ch = curl_init();
+		// 	$curlConfig = array(
+		// 	    CURLOPT_URL => $site_options->field('spree_endpoint') . "products/". $selected_product ."?per_page=1000&token=" . $site_options->field('webhook_token')
+		// 	);
+		// 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+		// 	curl_setopt_array($ch, $curlConfig);
+		// 	$result = curl_exec($ch);
+		// 	curl_close($ch);
+
+		// 	$product_detail = json_decode($result, true);
+		// 	// print_r($product_detail['taxon_ids']);
+	 // 		/* get the product details end */
+	 // 		$selected_taxon = $product_detail['taxon_ids'][0];
+ 	// 	}
 
  		$this->products = [];
  		 
@@ -226,7 +228,7 @@ class gv_acf_field_product extends acf_field {
 		<select id="<?php echo  $this->clean($field['name']) ?>" name="<?php echo esc_attr($field['name']) ?>"  class="<?php echo $field['wrapper']['class'] ?>" >
 			<option selected=""></option>
 			<?php foreach ($this->products as $key => $value) { ?>
-				<option <?php echo $value['id'] == $selected_product ? 'selected' : ''  ?> value="<?=  $value['id'] ?>" >   <?=  $value['name'] ?> </option>
+				<option <?php echo $value['id'] == $selected_product ? 'selected' : ''  ?> value="<?=  $value['id'] ?>_<?= $selected_taxon ?>" >   <?=  $value['name'] ?> </option>
 			<?php } ?>
 		</select>
 		<?php

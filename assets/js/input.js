@@ -10,7 +10,7 @@ function fill_products(taxon_id , product_field_name){
 				jQuery('#'+ product_field_name ).append('<option value=""></option>');
 			} else {
 				jQuery.each(json.products, function (key, data) {
-					jQuery('#'+ product_field_name ).append('<option  selected value="'+data.id+'" >'+data.name+'</option>');
+					jQuery('#'+ product_field_name ).append('<option  selected value="'+data.id+'_'+taxon_id+'" >'+data.name+'</option>');
 				});
 			}
 		}
