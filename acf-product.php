@@ -4,7 +4,7 @@
 Plugin Name: Advanced Custom Fields: Product
 Plugin URI: PLUGIN_URL
 Description: SHORT_DESCRIPTION
-Version: 1.0.0
+Version: 1.0.1
 Author: AUTHOR_NAME
 Author URI: AUTHOR_URL
 License: GPLv2 or later
@@ -19,11 +19,11 @@ if( ! defined( 'ABSPATH' ) ) exit;
 if( !class_exists('gv_acf_plugin_product') ) :
 
 class gv_acf_plugin_product {
-	
+
 	// vars
 	var $settings;
-	
-	
+
+
 	/*
 	*  __construct
 	*
@@ -36,9 +36,9 @@ class gv_acf_plugin_product {
 	*  @param	void
 	*  @return	void
 	*/
-	
+
 	function __construct() {
-		
+
 		// settings
 		// - these will be passed into the field class.
 		$this->settings = array(
@@ -46,14 +46,14 @@ class gv_acf_plugin_product {
 			'url'		=> plugin_dir_url( __FILE__ ),
 			'path'		=> plugin_dir_path( __FILE__ )
 		);
-		
-		
+
+
 		// include field
 		add_action('acf/include_field_types', 	array($this, 'include_field')); // v5
 		add_action('acf/register_fields', 		array($this, 'include_field')); // v4
 	}
-	
-	
+
+
 	/*
 	*  include_field
 	*
@@ -66,21 +66,21 @@ class gv_acf_plugin_product {
 	*  @param	$version (int) major ACF version. Defaults to false
 	*  @return	void
 	*/
-	
+
 	function include_field( $version = false ) {
-		
+
 		// support empty $version
 		if( !$version ) $version = 4;
-		
-		
+
+
 		// load textdomain
-		load_plugin_textdomain( 'prod', false, plugin_basename( dirname( __FILE__ ) ) . '/lang' ); 
-		
-		
+		load_plugin_textdomain( 'prod', false, plugin_basename( dirname( __FILE__ ) ) . '/lang' );
+
+
 		// include
 		include_once('fields/class-gv-acf-field-product-v' . $version . '.php');
 	}
-	
+
 }
 
 
@@ -90,5 +90,5 @@ new gv_acf_plugin_product();
 
 // class_exists check
 endif;
-	
+
 ?>
