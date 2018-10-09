@@ -1,11 +1,15 @@
+
+
 function fill_products(taxon_id , product_field_name){
 	console.log(product_field_name);
 	jQuery('#'+ product_field_name ).find('option').remove();
 	jQuery.ajax({
-		url: endpointDetails.ajax_url+'taxons/products?id='+taxon_id+'&per_page=1000&token='+endpointDetails.ajax_token,
+		url: endpointDetails.ajax_url+'taxons/products?id='+taxon_id+'&per_page=10&page=1&token='+endpointDetails.ajax_token,
 		type: 'GET',
 		datatype: 'jsonp',
 		success: function(json){
+			jQuery('#'+ product_field_name ).data('selected_taxon',taxon_id);
+
 			if(json.products.length == 0 ){
 				jQuery('#'+ product_field_name ).append('<option value=""></option>');
 			} else {
@@ -19,7 +23,7 @@ function fill_products(taxon_id , product_field_name){
 
 
 (function($){
-	
+
 	
 	/**
 	*  initialize_field
@@ -82,5 +86,101 @@ function fill_products(taxon_id , product_field_name){
 		});
 	
 	}
+
+
+
+	$(document).ready(function(){
+
+	  $('.product_loader_overlay').hide();
+
+      $('.loader').hide();
+
+	  $('.prod_select').on('scroll', function(){
+	    var sel = $(this);
+	    var lasto = sel.find('option:last');
+	    var s = sel.position().top + sel.height();
+	    var o = lasto.height() + lasto.position().top - 1;
+      	var data_url = $(this).data('url');
+      	var data_offset = $(this).data('page');	
+      	var data_type = $(this).data('type');	
+		var taxon_id =  $(this).data('selected_taxon');
+      	
+	    
+	      if(o < s){
+	        sel.siblings('.product_loader_overlay').show();
+
+	      	sel.siblings('.loader').show();
+
+	      	console.log(data_url);
+	      	console.log(data_offset);
+	      	console.log(data_type);
+	      	if(data_type == 'product'){
+	      		data_url = data_url + '&id=' + 	taxon_id
+	      	}
+	      	data_url = data_url + "&page=" +data_offset;
+			sel.data('page',parseInt(data_offset) + 1);
+
+			jQuery.ajax({
+				url: data_url,
+				type: 'GET',
+				datatype: 'jsonp',
+				success: function(json){
+
+					
+					if(data_type == 'product'){
+						if(json.products.length > 0 ) {
+							jQuery.each(json.products, function (key, data) {
+								sel.append('<option   value="'+data.id+'_'+taxon_id+'" >'+data.name+'</option>');
+							});
+						}
+					}else if(data_type == 'category'){
+						if(json.taxons.length > 0 ) {
+							create_flat_taxon_array(json.taxons,sel);
+
+							// jQuery.each(json.taxons, function (key, data) {
+							// 	sel.append('<option   value="'+data.id+'" >'+data.name+'</option>');
+							// });
+						}
+					}
+	      			sel.siblings('.product_loader_overlay').hide();
+
+	      			sel.siblings('.loader').hide();
+
+
+				}
+			});
+
+
+	      }
+	    
+	  });
+
+
+	function create_flat_taxon_array(taxon_json,sel){
+		// print_r($taxon_json);
+
+
+
+
+
+		$.each(taxon_json,function(index,value) {
+
+			// echo $value['pretty_name'];
+			// code...
+			// taxons[value['id']] = value['pretty_name'];
+			sel.append('<option   value="'+value.id+'" >'+value.pretty_name+'</option>');
+			console.log(value);
+			if(value.taxons.length > 0 ){
+				create_flat_taxon_array(value.taxons,sel);
+			}
+
+		});
+
+	}
+
+
+	});
+
+
 
 })(jQuery);
