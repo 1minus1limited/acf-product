@@ -35,3 +35,9 @@
    
 
 }
+
+.acf-input label, .acf-label label {
+    cursor: pointer;
+    margin-top: 5px;
+    display: block;
+}

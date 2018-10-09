@@ -248,7 +248,7 @@ class gv_acf_field_product extends acf_field {
 			$this->products = json_decode($result, true)['products'];
 
 			array_push($this->products, $selected_product_json);
-			
+
 	 		/* get the product details end */
 	 		
  		}
@@ -269,17 +269,18 @@ class gv_acf_field_product extends acf_field {
 		?>
 
 		<div class="product_loader_overlay" ></div>
-		<label>Category Filter</label>
+		<label><strong>Category Filter</strong></label><br/>
 			<select  size="5" data-url="<?= $site_options->field('spree_endpoint') . 'taxons/?per_page=1&token=' . $site_options->field('webhook_token') ?>" data-page="2" data-type="category"  onchange="fill_products(this.value,'<?php echo $this->clean($field['name']) ?>')" class="prod_select" >
 				<option selected=""></option>
 			<?php foreach ($this->taxons as $key => $value) { ?>
 				<option <?php echo $key == $selected_taxon ? 'selected' : ''  ?> value="<?=  $key ?>" >   <?=  $value ?> </option>
 			<?php } ?>
 			</select>
+			<br/>
 
 		<div class="loader" ></div>
 
-		<label>Product</label>
+		<label><strong>Product</strong></label><br/>
 
 		<select size="5" data-url="<?= $site_options->field('spree_endpoint') . "products/?per_page=10&token=" . $site_options->field('webhook_token') ?>" data-page="2" data-type="product"  id="<?php echo  $this->clean($field['name']) ?>" name="<?php echo esc_attr($field['name']) ?>"  class="<?php echo $field['wrapper']['class'] ?> prod_select" >
 			<option selected=""></option>
@@ -287,6 +288,7 @@ class gv_acf_field_product extends acf_field {
 				<option <?php echo $value['id'] == $selected_product ? 'selected' : ''  ?> value="<?=  $value['id'] ?>_<?= $selected_taxon ?>" >   <?=  $value['name'] ?> </option>
 			<?php } ?>
 		</select>
+		<br/>
 		<?php
 	}
 	
