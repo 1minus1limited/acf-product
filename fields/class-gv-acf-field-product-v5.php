@@ -32,7 +32,7 @@ class gv_acf_field_product extends acf_field {
 		
 		$this->name = 'product';
 		
-		
+		$this->taxonomy_ids = [];
 		/*
 		*  label (string) Multiple words, can include spaces, visible when selecting a field type
 		*/
@@ -145,7 +145,7 @@ class gv_acf_field_product extends acf_field {
  		/* get the taxons start */
 		$ch = curl_init();
 		$curlConfig = array(
-		    CURLOPT_URL => $site_options->field('spree_endpoint') . "taxons/?per_page=1000&token=" . $site_options->field('webhook_token')
+		    CURLOPT_URL => $site_options->field('spree_endpoint') . "taxons/?per_page=1&page=1&token=" . $site_options->field('webhook_token')
 		);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt_array($ch, $curlConfig);
@@ -181,12 +181,64 @@ class gv_acf_field_product extends acf_field {
  	// 	}
 
  		$this->products = [];
+ 		$selected_product_json ;
  		 
  		if($selected_product && $selected_taxon){
+
+			$ch = curl_init();
+			$curlConfig = array(
+			    CURLOPT_URL => $site_options->field('spree_endpoint')  . "products/".explode("_", $selected_product)[0]."?token=" . $site_options->field('webhook_token')
+			);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+			curl_setopt_array($ch, $curlConfig);
+			$result = curl_exec($ch);
+			curl_close($ch);
+			$selected_product_json = json_decode($result,true);
+
+
+			$ch = curl_init();
+			$curlConfig = array(
+			    CURLOPT_URL => $site_options->field('spree_endpoint')  . "taxonomies/?token=" . $site_options->field('webhook_token')
+			);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+			curl_setopt_array($ch, $curlConfig);
+			$result = curl_exec($ch);
+			curl_close($ch);
+
+			$taxonomies = json_decode($result, true)['taxonomies'];
+
+			foreach ($taxonomies as $index => $taxonomy) {
+
+				array_push($this->taxonomy_ids, $taxonomy['id']);
+				$this->taxonomy_ids = array_unique($this->taxonomy_ids);
+			}
+
+
+			foreach ($this->taxonomy_ids as $index => $taxonomy_id) {
+				# code...
+				$ch = curl_init();
+				$curlConfig = array(
+				    CURLOPT_URL => $site_options->field('spree_endpoint')  . "taxonomies/". $taxonomy_id . "/taxons/" . $selected_taxon ."/?token=" . $site_options->field('webhook_token')
+				);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+				curl_setopt_array($ch, $curlConfig);
+				$result = curl_exec($ch);
+				$result = json_decode($result, true);
+				curl_close($ch);
+				
+				if(isset($result['id'])){
+					$this->taxons[$result['id']] = $result['pretty_name'];
+					break;
+				}
+			}
+
+
+
+
 			/* get the product details start */
 			$ch = curl_init();
 			$curlConfig = array(
-			    CURLOPT_URL => $site_options->field('spree_endpoint') . "products/?id=". $selected_taxon ."&per_page=1000&token=" . $site_options->field('webhook_token')
+			    CURLOPT_URL => $site_options->field('spree_endpoint') . "products/?id=". $selected_taxon ."&per_page=10&page=1&token=" . $site_options->field('webhook_token')
 			);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 			curl_setopt_array($ch, $curlConfig);
@@ -194,6 +246,9 @@ class gv_acf_field_product extends acf_field {
 			curl_close($ch);
 
 			$this->products = json_decode($result, true)['products'];
+
+			array_push($this->products, $selected_product_json);
+
 	 		/* get the product details end */
 	 		
  		}
@@ -213,24 +268,27 @@ class gv_acf_field_product extends acf_field {
 
 		?>
 
-		<label>Category Filter</label>
-			<select onchange="fill_products(this.value,'<?php echo $this->clean($field['name']) ?>')" >
+		<div class="product_loader_overlay" ></div>
+		<label><strong>Category Filter</strong></label><br/>
+			<select  size="5" data-url="<?= $site_options->field('spree_endpoint') . 'taxons/?per_page=1&token=' . $site_options->field('webhook_token') ?>" data-page="2" data-type="category"  onchange="fill_products(this.value,'<?php echo $this->clean($field['name']) ?>')" class="prod_select" >
 				<option selected=""></option>
 			<?php foreach ($this->taxons as $key => $value) { ?>
 				<option <?php echo $key == $selected_taxon ? 'selected' : ''  ?> value="<?=  $key ?>" >   <?=  $value ?> </option>
 			<?php } ?>
 			</select>
+			<br/>
 
+		<div class="loader" ></div>
 
+		<label><strong>Product</strong></label><br/>
 
-		<label>Product</label>
-
-		<select id="<?php echo  $this->clean($field['name']) ?>" name="<?php echo esc_attr($field['name']) ?>"  class="<?php echo $field['wrapper']['class'] ?>" >
+		<select size="5" data-url="<?= $site_options->field('spree_endpoint') . "products/?per_page=10&token=" . $site_options->field('webhook_token') ?>" data-page="2" data-type="product"  id="<?php echo  $this->clean($field['name']) ?>" name="<?php echo esc_attr($field['name']) ?>"  class="<?php echo $field['wrapper']['class'] ?> prod_select" >
 			<option selected=""></option>
 			<?php foreach ($this->products as $key => $value) { ?>
 				<option <?php echo $value['id'] == $selected_product ? 'selected' : ''  ?> value="<?=  $value['id'] ?>_<?= $selected_taxon ?>" >   <?=  $value['name'] ?> </option>
 			<?php } ?>
 		</select>
+		<br/>
 		<?php
 	}
 	
