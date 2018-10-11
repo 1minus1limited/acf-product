@@ -282,7 +282,7 @@ class gv_acf_field_product extends acf_field {
 
 		<label><strong>Product</strong></label><br/>
 
-		<select size="5" data-url="<?= $site_options->field('spree_endpoint') . "products/?per_page=10&token=" . $site_options->field('webhook_token') ?>" data-page="2" data-type="product"  id="<?php echo  $this->clean($field['name']) ?>" name="<?php echo esc_attr($field['name']) ?>"  class="<?php echo $field['wrapper']['class'] ?> prod_select" >
+		<select size="5" data-url="<?= $site_options->field('spree_endpoint') . "products/?per_page=10&token=" . $site_options->field('webhook_token') ?>" data-page="2" data-type="product" data-selected_taxon="<?= $selected_taxon ?>"   id="<?php echo  $this->clean($field['name']) ?>" name="<?php echo esc_attr($field['name']) ?>"  class="<?php echo $field['wrapper']['class'] ?> prod_select" >
 			<option selected=""></option>
 			<?php foreach ($this->products as $key => $value) { ?>
 				<option <?php echo $value['id'] == $selected_product ? 'selected' : ''  ?> value="<?=  $value['id'] ?>_<?= $selected_taxon ?>" >   <?=  $value['name'] ?> </option>
