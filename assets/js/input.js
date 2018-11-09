@@ -3,6 +3,7 @@
 function fill_products(taxon_id , product_field_name){
 	console.log(product_field_name);
 	jQuery('#'+ product_field_name ).find('option').remove();
+	jQuery('#'+ product_field_name ).data("page","2");
 	jQuery.ajax({
 		url: endpointDetails.ajax_url+'taxons/products?id='+taxon_id+'&per_page=10&page=1&token='+endpointDetails.ajax_token,
 		type: 'GET',
@@ -98,6 +99,7 @@ function fill_products(taxon_id , product_field_name){
 	  $('.prod_select').on('scroll', function(){
 	    var sel = $(this);
 	    var lasto = sel.find('option:last');
+	    if(lasto.position()){
 	    var s = sel.position().top + sel.height();
 	    var o = lasto.height() + lasto.position().top - 1;
       	var data_url = $(this).data('url');
@@ -111,9 +113,9 @@ function fill_products(taxon_id , product_field_name){
 
 	      	sel.siblings('.loader').show();
 
-	      	console.log(data_url);
+
 	      	console.log(data_offset);
-	      	console.log(data_type);
+
 	      	if(data_type == 'product'){
 	      		data_url = data_url + '&id=' + 	taxon_id
 	      	}
@@ -152,6 +154,7 @@ function fill_products(taxon_id , product_field_name){
 
 
 	      }
+	     }
 	    
 	  });
 
@@ -169,7 +172,7 @@ function fill_products(taxon_id , product_field_name){
 			// code...
 			// taxons[value['id']] = value['pretty_name'];
 			sel.append('<option   value="'+value.id+'" >'+value.pretty_name+'</option>');
-			console.log(value);
+
 			if(value.taxons.length > 0 ){
 				create_flat_taxon_array(value.taxons,sel);
 			}
