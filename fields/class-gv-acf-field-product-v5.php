@@ -238,7 +238,7 @@ class gv_acf_field_product extends acf_field {
 			/* get the product details start */
 			$ch = curl_init();
 			$curlConfig = array(
-			    CURLOPT_URL => $site_options->field('spree_endpoint') . "products/?id=". $selected_taxon ."&per_page=10&page=1&token=" . $site_options->field('webhook_token')
+			    CURLOPT_URL => $site_options->field('spree_endpoint') . "taxons/products/?id=". $selected_taxon ."&per_page=10&page=1&token=" . $site_options->field('webhook_token')
 			);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 			curl_setopt_array($ch, $curlConfig);
@@ -282,7 +282,7 @@ class gv_acf_field_product extends acf_field {
 
 		<label><strong>Product</strong></label><br/>
 
-		<select size="5" data-url="<?= $site_options->field('spree_endpoint') . "products/?per_page=10&token=" . $site_options->field('webhook_token') ?>" data-page="2" data-type="product" data-selected_taxon="<?= $selected_taxon ?>"   id="<?php echo  $this->clean($field['name']) ?>" name="<?php echo esc_attr($field['name']) ?>"  class="<?php echo $field['wrapper']['class'] ?> prod_select" >
+		<select size="5" data-url="<?= $site_options->field('spree_endpoint') . "taxons/products/?per_page=10&token=" . $site_options->field('webhook_token') ?>" data-page="2" data-type="product" data-selected_taxon="<?= $selected_taxon ?>"   id="<?php echo  $this->clean($field['name']) ?>" name="<?php echo esc_attr($field['name']) ?>"  class="<?php echo $field['wrapper']['class'] ?> prod_select" >
 			<option selected=""></option>
 			<?php foreach ($this->products as $key => $value) { ?>
 				<option <?php echo $value['id'] == $selected_product ? 'selected' : ''  ?> value="<?=  $value['id'] ?>_<?= $selected_taxon ?>" >   <?=  $value['name'] ?> </option>
