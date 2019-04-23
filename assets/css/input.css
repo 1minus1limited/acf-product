@@ -1,6 +1,6 @@
 .acf-field select {
     padding: 2px;
-    height: 110px;
+    height: auto;
 }
 
 .loader {
